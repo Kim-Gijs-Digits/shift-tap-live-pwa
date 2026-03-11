@@ -1,11 +1,13 @@
 {
   "name": "Shift-Tap",
   "short_name": "Shift-Tap",
-  "start_url": "./index.html",
+  "id": "./",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#12070b",
   "theme_color": "#12070b",
+  "description": "Shift-Tap work time and shift tracking app",
   "icons": [
     {
       "src": "ST-logo.png",
