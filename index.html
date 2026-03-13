@@ -4,10 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>SHIFT-TAP</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#12070b">
 
-<link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="ST-logo.png">
+
+  <meta name="theme-color" content="#12070b">
+
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
 
 <style>
 
@@ -949,10 +952,18 @@ margin-bottom: 16px;
   line-height:1;
   transform:translateY(-1px);
 }
+.weekLock{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px;
+}
+
 .weekLock img{
   width:20px;
   height:20px;
   vertical-align:middle;
+  pointer-events:none;
 }
 .h2Row{
   position:relative;
@@ -4801,8 +4812,7 @@ function renderHistory(){
     const wrap = document.createElement("div");
     wrap.style.marginTop = "12px";
 
-    const head = document.createElement("button");
-    head.type = "button";
+    const head = document.createElement("div");
     head.className = "btnGhost";
     head.style.display = "flex";
     head.style.justifyContent = "space-between";
@@ -4826,26 +4836,23 @@ function renderHistory(){
     const body = document.createElement("div");
     body.style.display = "none";
 
-    head.addEventListener("click", ()=>{
-      body.style.display = body.style.display === "none" ? "block" : "none";
-    });
-    const lock = head.querySelector(".weekLock");
+  head.addEventListener("click", (ev) => {
+  const lockEl = ev.target.closest(".weekLock, .weekLock img");
+  if (lockEl) {
+    ev.preventDefault();
+    ev.stopPropagation();
 
-lock?.addEventListener("click",(ev)=>{
-  ev.stopPropagation();
+    const weekKey = lockEl.closest(".weekLock").dataset.week;
+    const locked = isWeekLocked(weekKey);
 
-  const weekKey = lock.dataset.week;
-  const locked = isWeekLocked(weekKey);
-
-  if(locked){
-    openConfirm("Week ontgrendelen?", ()=>{
-      toggleWeekLock(weekKey);
-    });
-  }else{
-    openConfirm("Week vergrendelen?", ()=>{
-      toggleWeekLock(weekKey);
-    });
+    openConfirm(
+      locked ? "Week ontgrendelen?" : "Week vergrendelen?",
+      () => toggleWeekLock(weekKey)
+    );
+    return;
   }
+
+  body.style.display = body.style.display === "none" ? "block" : "none";
 });
 
     group.items.forEach(e=>{
@@ -5822,5 +5829,14 @@ init();
   </div>
 </div>
 <!-- ===== SETUP MODAL END ===== -->
+ <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(reg => console.log('Service Worker geregistreerd', reg))
+      .catch(err => console.log('Service Worker fout', err));
+  });
+}
+</script>
 </body>
 </html>
