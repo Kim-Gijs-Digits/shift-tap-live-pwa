@@ -710,6 +710,16 @@ input::-webkit-calendar-picker-indicator{ filter: invert(1); }
   z-index:2;
   pointer-events:none;
 }
+.calDeltaMini{
+  position:absolute;
+  top:8px;
+  right:8px;
+  font-size:12px;
+  font-weight:900;
+  line-height:1;
+  opacity:.95;
+  pointer-events:none;
+}
 
 /* 1 kleur per type */
 .calWork{ 
@@ -937,6 +947,13 @@ input::-webkit-calendar-picker-indicator{ filter: invert(1); }
 }
 .setupHint{
 margin-bottom: 16px;
+color: rgba(255, 210, 210, .72);
+}
+#setupOverlay [data-i18n="setup_intro"]{
+  color: rgba(255, 210, 210, .72);
+}
+.setupField label{
+  color: rgba(255,255,255,.68);
 }
 .setupLangRow{
   display:flex;
@@ -1103,6 +1120,12 @@ button:active,
   box-shadow:
     inset 0 1px 3px rgba(255,255,255,0.15),
     0 3px 8px rgba(0,0,0,0.28);
+}
+.setupField + .setupField{
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.28);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
 }
 
 
@@ -1527,6 +1550,23 @@ button:active,
 
 </div>
 
+<div class="sp"></div>
+
+<div class="label-with-info">
+  <label data-i18n="off_days_label">Op welke dagen werkt u normaal niet?</label>
+  <span class="info-icon" id="infoOffDays">ⓘ</span>
+  <div class="info-bubble" id="bubbleOffDays" data-i18n="off_days_info"></div>
+</div>
+
+<button
+  id="btnOffDaysOpen"
+  type="button"
+  class="btnSmall"
+  style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+<span id="offDaysCurrentLabel">Geen</span>
+  <span aria-hidden="true">▾</span>
+</button>
+
     <div class="row" style="margin-top:16px;">
       <button class="btnGhost" id="btnSaveSettings" data-i18n="settings">
         Opslaan
@@ -1930,6 +1970,8 @@ nl: {
   vac_taken: "Opgenomen vakantie",
   overtime: "Saldo overuren",
   overtime_settled: "Overuren verrekend",
+  overtime_label: "Overuren",
+  undertime_label: "Minuren",
   minutes: "min",
   hours: "u",
   days: "dag",
@@ -1950,6 +1992,23 @@ nl: {
   edit_btn: "✎ Bewerken",
   edit_aria: "Bewerken",
   note_label: "Opmerking",
+  off_days_label: "Op welke dagen werkt u normaal niet?",
+off_days_info: "Werkt u toch op deze dagen, dan tellen alle uren automatisch als overuren.",
+off_days_none: "Geen",
+day_monday: "Maandag",
+day_tuesday: "Dinsdag",
+day_wednesday: "Woensdag",
+day_thursday: "Donderdag",
+day_friday: "Vrijdag",
+day_saturday: "Zaterdag",
+day_sunday: "Zondag",
+day_monday_short: "Ma",
+day_tuesday_short: "Di",
+day_wednesday_short: "Wo",
+day_thursday_short: "Do",
+day_friday_short: "Vr",
+day_saturday_short: "Za",
+day_sunday_short: "Zo",
 
   // --- Verrekening ---
   settle: "Verrekenen",
@@ -2005,7 +2064,7 @@ nl: {
   setup_title: "Welkom bij Shift-Tap 👋",
   setup_intro: "Werkuren, recup en overuren zonder gedoe. Stel eerst even je basisinstellingen in.",
   setup_lang: "Taal",
-  setup_normday: "Normale werkdag (uren)",
+  setup_normday: "Duur normale werkdag, pauze NIET meegerekend (uren)",
   setup_norm_hint: "Voorbeeld: 07:30 of 08:00",
   setup_pause: "Pauze (minuten)",
   setup_pause_hint: "Dit is uw standaard pauze, deze wordt automatisch afgetrokken.",
@@ -2098,12 +2157,14 @@ it: {
   status_not_started: "Non avviato",
   status_online: "Stato: online",
   status_offline: "Stato: offline",
- week_locked: "La settimana è bloccata",
+  week_locked: "La settimana è bloccata",
   today_work: "Oggi",
   week_work: "Questa settimana",
   vac_taken: "Ferie utilizzate",
   overtime: "Saldo straordinari",
   overtime_settled: "Straordinari compensati",
+ overtime_label: "Straordinari",
+undertime_label: "Ore mancanti",
   minutes: "min",
   hours: "h",
   days: "giorno",
@@ -2124,6 +2185,23 @@ it: {
   edit_btn: "✎ Modifica",
   edit_aria: "Modifica",
   note_label: "Nota",
+  off_days_label: "In quali giorni normalmente non lavori?",
+off_days_info: "Se lavori comunque in questi giorni, tutte le ore lavorate verranno conteggiate automaticamente come straordinari.",
+off_days_none: "Nessuno",
+day_monday: "Lunedì",
+day_tuesday: "Martedì",
+day_wednesday: "Mercoledì",
+day_thursday: "Giovedì",
+day_friday: "Venerdì",
+day_saturday: "Sabato",
+day_sunday: "Domenica",
+day_monday_short: "Lun",
+day_tuesday_short: "Mar",
+day_wednesday_short: "Mer",
+day_thursday_short: "Gio",
+day_friday_short: "Ven",
+day_saturday_short: "Sab",
+day_sunday_short: "Dom",
 
   // --- Verrekening ---
   settle: "Compensa",
@@ -2179,7 +2257,7 @@ it: {
   setup_title: "Benvenuto in Shift-Tap 👋",
   setup_intro: "Ore di lavoro, recupero e straordinari senza complicazioni. Configura prima le impostazioni di base.",
   setup_lang: "Lingua",
-  setup_normday: "Giornata lavorativa normale (ore)",
+  setup_normday: "Durata della normale giornata lavorativa, pausa NON inclusa (ore)",
   setup_norm_hint: "Esempio: 07:30 o 08:00",
   setup_pause: "Pausa (minuti)",
   setup_pause_hint: "Questa è la pausa standard che verrà sottratta automaticamente.",
@@ -2301,6 +2379,8 @@ en: {
   // ===== Overtime / Settlement =====
   overtime: "Overtime balance",
   overtime_settled: "Overtime settled",
+  overtime_label: "Overtime",
+undertime_label: "Undertime",
   settle: "Deduct",
   settle_hint: "Have your overtime hours been paid out? Record them here to deduct them from your balance.",
   verrek_none: "No settlement found on that day.",
@@ -2323,6 +2403,23 @@ en: {
   minutes: "min",
   hours: "h",
   days: "day",
+  off_days_label: "On which days do you normally not work?",
+off_days_info: "If you do work on these days, all worked hours will automatically count as overtime.",
+off_days_none: "None",
+day_monday: "Monday",
+day_tuesday: "Tuesday",
+day_wednesday: "Wednesday",
+day_thursday: "Thursday",
+day_friday: "Friday",
+day_saturday: "Saturday",
+day_sunday: "Sunday",
+day_monday_short: "Mon",
+day_tuesday_short: "Tue",
+day_wednesday_short: "Wed",
+day_thursday_short: "Thu",
+day_friday_short: "Fri",
+day_saturday_short: "Sat",
+day_sunday_short: "Sun",
 
   // ===== Types =====
   work: "Work",
@@ -2356,11 +2453,13 @@ en: {
   edit_aria: "Edit",
   note_label: "Note",
 
+
+
   // ===== Setup modal =====
   setup_title: "Welcome to Shift-Tap 👋",
   setup_intro: "Work hours, recup and overtime without hassle. First set your basic settings.",
   setup_lang: "Language",
-  setup_normday: "Normal workday (hours)",
+  setup_normday: "Length of a normal workday, break NOT included (hours)",
   setup_norm_hint: "Example: 07:30 or 08:00",
   setup_pause: "Break (minutes)",
   setup_pause_hint: "This is your default break and will be automatically deducted.",
@@ -2463,6 +2562,8 @@ hu: {
   vac_taken: "Kivett szabadság",
   overtime: "Túlóra egyenleg",
   overtime_settled: "Túlóra elszámolva",
+  overtime_label: "Túlóra",
+undertime_label: "Hiányóra",
   minutes: "perc",
   hours: "óra",
   days: "nap",
@@ -2483,6 +2584,23 @@ hu: {
   edit_btn: "✎ Szerkesztés",
   edit_aria: "Szerkesztés",
   note_label: "Megjegyzés",
+  off_days_label: "Mely napokon nem dolgozol általában?",
+off_days_info: "Ha mégis dolgozol ezeken a napokon, minden ledolgozott idő automatikusan túlórának számít.",
+off_days_none: "Nincs",
+day_monday: "Hétfő",
+day_tuesday: "Kedd",
+day_wednesday: "Szerda",
+day_thursday: "Csütörtök",
+day_friday: "Péntek",
+day_saturday: "Szombat",
+day_sunday: "Vasárnap",
+day_monday_short: "H",
+day_tuesday_short: "K",
+day_wednesday_short: "Sze",
+day_thursday_short: "Cs",
+day_friday_short: "P",
+day_saturday_short: "Szo",
+day_sunday_short: "V",
 
   // --- Settlement ---
   settle: "Elszámolás",
@@ -2538,7 +2656,7 @@ hu: {
   setup_title: "Üdv a Shift-Tap alkalmazásban 👋",
   setup_intro: "Munkaidő, szabadnap és túlóra egyszerűen. Először állítsd be az alapbeállításokat.",
   setup_lang: "Nyelv",
-  setup_normday: "Normál munkanap (óra)",
+  setup_normday: "Normál munkanap hossza, a szünet NEM számít bele (óra)",
   setup_norm_hint: "Példa: 07:30 vagy 08:00",
   setup_pause: "Szünet (perc)",
   setup_pause_hint: "Ez az alapértelmezett szünet, amely automatikusan levonásra kerül.",
@@ -2639,9 +2757,28 @@ de: {
   vac_taken: "Urlaub genommen",
   overtime: "Überstunden Saldo",
   overtime_settled: "Überstunden verrechnet",
+  overtime_label: "Überstunden",
+undertime_label: "Minusstunden",
   minutes: "min",
   hours: "Std",
   days: "Tag",
+  off_days_label: "An welchen Tagen arbeitest du normalerweise nicht?",
+off_days_info: "Wenn du an diesen Tagen doch arbeitest, werden alle geleisteten Stunden automatisch als Überstunden gezählt.",
+off_days_none: "Keine",
+day_monday: "Montag",
+day_tuesday: "Dienstag",
+day_wednesday: "Mittwoch",
+day_thursday: "Donnerstag",
+day_friday: "Freitag",
+day_saturday: "Samstag",
+day_sunday: "Sonntag",
+day_monday_short: "Mo",
+day_tuesday_short: "Di",
+day_wednesday_short: "Mi",
+day_thursday_short: "Do",
+day_friday_short: "Fr",
+day_saturday_short: "Sa",
+day_sunday_short: "So",
 
   work: "Arbeit",
   work_label: "ARBEIT",
@@ -2705,7 +2842,7 @@ de: {
   setup_title: "Willkommen bei Shift-Tap 👋",
   setup_intro: "Arbeitszeit, Freizeitausgleich und Überstunden ohne Aufwand. Richte zuerst deine Grundeinstellungen ein.",
   setup_lang: "Sprache",
-  setup_normday: "Normale Arbeitszeit (Stunden)",
+  setup_normday: "Dauer eines normalen Arbeitstags, Pause NICHT eingerechnet (Stunden)",
   setup_norm_hint: "Beispiel: 07:30 oder 08:00",
   setup_pause: "Pause (Minuten)",
   setup_pause_hint: "Dies ist deine Standardpause und wird automatisch abgezogen.",
@@ -2807,9 +2944,28 @@ pl: {
   vac_taken: "Wykorzystany urlop",
   overtime: "Saldo nadgodzin",
   overtime_settled: "Nadgodziny rozliczone",
+  overtime_label: "Nadgodziny",
+undertime_label: "Niedogodziny",
   minutes: "min",
   hours: "godz.",
   days: "dzień",
+  off_days_label: "W które dni normalnie nie pracujesz?",
+off_days_info: "Jeśli jednak pracujesz w te dni, wszystkie przepracowane godziny będą automatycznie liczone jako nadgodziny.",
+off_days_none: "Brak",
+day_monday: "Poniedziałek",
+day_tuesday: "Wtorek",
+day_wednesday: "Środa",
+day_thursday: "Czwartek",
+day_friday: "Piątek",
+day_saturday: "Sobota",
+day_sunday: "Niedziela",
+day_monday_short: "Pon",
+day_tuesday_short: "Wt",
+day_wednesday_short: "Śr",
+day_thursday_short: "Czw",
+day_friday_short: "Pt",
+day_saturday_short: "Sob",
+day_sunday_short: "Nd",
 
   // --- Types / labels ---
   work: "Praca",
@@ -2882,7 +3038,7 @@ pl: {
   setup_title: "Witamy w Shift-Tap 👋",
   setup_intro: "Godziny pracy, odbiór i nadgodziny bez problemów. Najpierw ustaw podstawowe ustawienia.",
   setup_lang: "Język",
-  setup_normday: "Normalny dzień pracy (godziny)",
+  setup_normday: "Długość normalnego dnia pracy, przerwa NIE jest wliczona (godziny)",
   setup_norm_hint: "Przykład: 07:30 lub 08:00",
   setup_pause: "Przerwa (minuty)",
   setup_pause_hint: "To jest twoja domyślna przerwa i zostanie automatycznie odjęta.",
@@ -2984,9 +3140,28 @@ es: {
   vac_taken: "Vacaciones tomadas",
   overtime: "Saldo de horas extra",
   overtime_settled: "Horas extra liquidadas",
+  overtime_label: "Horas extra",
+undertime_label: "Horas faltantes",
   minutes: "min",
   hours: "h",
   days: "día",
+  off_days_label: "¿Qué días no trabajas normalmente?",
+off_days_info: "Si aun así trabajas en estos días, todas las horas trabajadas contarán automáticamente como horas extra.",
+off_days_none: "Ninguno",
+day_monday: "Lunes",
+day_tuesday: "Martes",
+day_wednesday: "Miércoles",
+day_thursday: "Jueves",
+day_friday: "Viernes",
+day_saturday: "Sábado",
+day_sunday: "Domingo",
+day_monday_short: "Lun",
+day_tuesday_short: "Mar",
+day_wednesday_short: "Mié",
+day_thursday_short: "Jue",
+day_friday_short: "Vie",
+day_saturday_short: "Sáb",
+day_sunday_short: "Dom",
 
   // --- Types / labels ---
   work: "Trabajo",
@@ -3059,7 +3234,7 @@ es: {
   setup_title: "Bienvenido a Shift-Tap 👋",
   setup_intro: "Horas de trabajo, recuperación y horas extra sin complicaciones. Configura primero tus ajustes básicos.",
   setup_lang: "Idioma",
-  setup_normday: "Jornada normal (horas)",
+  setup_normday: "Duración de una jornada laboral normal, pausa NO incluida (horas)",
   setup_norm_hint: "Ejemplo: 07:30 o 08:00",
   setup_pause: "Pausa (minutos)",
   setup_pause_hint: "Esta es tu pausa predeterminada y se descontará automáticamente.",
@@ -3180,6 +3355,8 @@ fr: {
   // ===== Heures sup / Régularisation =====
   overtime: "Solde heures sup",
   overtime_settled: "Heures supplémentaires réglées",
+  overtime_label: "Heures sup",
+undertime_label: "Heures en moins",
   settle: "Compenser",
   settle_hint: "Des heures supplémentaires ont été payées ? Enregistre-les ici pour les déduire de ton solde.",
   verrek_none: "Aucune régularisation trouvée ce jour-là.",
@@ -3202,6 +3379,23 @@ fr: {
   minutes: "min",
   hours: "h",
   days: "jour",
+  off_days_label: "Quels jours ne travaillez-vous normalement pas ?",
+off_days_info: "Si vous travaillez quand même ces jours-là, toutes les heures seront automatiquement comptées comme heures supplémentaires.",
+off_days_none: "Aucun",
+day_monday: "Lundi",
+day_tuesday: "Mardi",
+day_wednesday: "Mercredi",
+day_thursday: "Jeudi",
+day_friday: "Vendredi",
+day_saturday: "Samedi",
+day_sunday: "Dimanche",
+day_monday_short: "Lun",
+day_tuesday_short: "Mar",
+day_wednesday_short: "Mer",
+day_thursday_short: "Jeu",
+day_friday_short: "Ven",
+day_saturday_short: "Sam",
+day_sunday_short: "Dim",
 
   // ===== Types =====
   work: "Travail",
@@ -3239,7 +3433,7 @@ fr: {
   setup_title: "Bienvenue sur Shift-Tap 👋",
   setup_intro: "Heures de travail, récup et heures supplémentaires sans tracas. Configure d'abord tes réglages de base.",
   setup_lang: "Langue",
-  setup_normday: "Journée normale (heures)",
+  setup_normday: "Durée normale de la journée de travail, pause NON comprise (heures)",
   setup_norm_hint: "Exemple : 07:30 ou 08:00",
   setup_pause: "Pause (minutes)",
   setup_pause_hint: "Ceci est votre pause standard, elle sera automatiquement déduite.",
@@ -3493,10 +3687,12 @@ verrekenInput?.addEventListener("input", (e) => {
   /* =========================
      State + Meta defaults
      ========================= */
-  const defaultState = () => ({
+const defaultState = () => ({
   settings: { 
     startSaldoMin: 0, 
     normDayMin: NORM_MIN, 
+    pauseMin: 30,
+    offDays: [],
     lang: "nl",
     employeeName: "",
     employerName: ""
@@ -3525,6 +3721,16 @@ if(typeof s.settings.startSaldoMin !== "number")
 
 if(typeof s.settings.normDayMin !== "number")
   s.settings.normDayMin = NORM_MIN;
+
+  if(typeof s.settings.pauseMin !== "number")
+  s.settings.pauseMin = 30;
+
+if(!Array.isArray(s.settings.offDays))
+  s.settings.offDays = [];
+else
+  s.settings.offDays = s.settings.offDays
+    .map(v => parseInt(v, 10))
+    .filter(v => v >= 1 && v <= 7);
 
 if(typeof s.settings.lang !== "string")
   s.settings.lang = "nl";
@@ -3596,10 +3802,26 @@ window.saveState = saveState;
   const elNormDayH = document.getElementById("normDayH");
 const elNormDayM = document.getElementById("normDayM");
 
+const setupOffDay1 = document.getElementById("setupOffDay1");
+const setupOffDay2 = document.getElementById("setupOffDay2");
+const setupOffDay3 = document.getElementById("setupOffDay3");
+const setupOffDay4 = document.getElementById("setupOffDay4");
+const setupOffDay5 = document.getElementById("setupOffDay5");
+const setupOffDay6 = document.getElementById("setupOffDay6");
+const setupOffDay7 = document.getElementById("setupOffDay7");
+const btnSetupOffDaysOpen = document.getElementById("btnSetupOffDaysOpen");
+const setupOffDaysCurrentLabel = document.getElementById("setupOffDaysCurrentLabel");
+
   const elTodayWork       = document.getElementById("todayWork");
   const elWeekWork        = document.getElementById("weekWork");
   const elOvertimeSaldo   = document.getElementById("overtimeSaldo");
 const elVacTaken = document.getElementById("vacTaken");
+
+const btnOffDaysOpen = document.getElementById("btnOffDaysOpen");
+const offDaysOverlay = document.getElementById("offDaysOverlay");
+const btnOffDaysCancel = document.getElementById("btnOffDaysCancel");
+const btnOffDaysDone = document.getElementById("btnOffDaysDone");
+const offDaysCurrentLabel = document.getElementById("offDaysCurrentLabel");
 
   const elHistoryList     = document.getElementById("historyList");
 
@@ -3617,6 +3839,8 @@ const elVacTaken = document.getElementById("vacTaken");
 
 const infoStartSaldo = document.getElementById("infoStartSaldo");
 const bubbleStartSaldo = document.getElementById("bubbleStartSaldo");
+const infoOffDays = document.getElementById("infoOffDays");
+const bubbleOffDays = document.getElementById("bubbleOffDays");
 const infoRecup = document.getElementById("infoRecup");
 const bubbleRecup = document.getElementById("bubbleRecup");
 const infoNormDay = document.getElementById("infoNormDay");
@@ -3892,6 +4116,38 @@ btnCalNext?.addEventListener("click", ()=>{
   const ymd  = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   
   const dmy  = d => `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;
+ 
+  function dayDeltaMin(dateYMD){
+  if(!dateYMD) return 0;
+
+  const normDay = state.settings?.normDayMin ?? NORM_MIN;
+  const workNet = workNetForDate(dateYMD);
+  const hasWork = workNet > 0;
+
+  if(!hasWork) return 0;
+
+  return isConfiguredOffDay(dateYMD)
+    ? workNet
+    : (workNet - normDay);
+}
+
+function formatDayDeltaLabel(dateYMD){
+  const delta = dayDeltaMin(dateYMD);
+  if(!delta) return "";
+
+  return delta > 0
+    ? `${t("overtime_label")} +${formatHM(delta)}`
+    : `${t("undertime_label")} -${formatHM(Math.abs(delta))}`;
+}
+function formatDayDeltaCompactLabel(dateYMD){
+  const delta = dayDeltaMin(dateYMD);
+  if(!delta) return "";
+
+  return delta > 0
+    ? `+${formatHM(delta)}`
+    : `-${formatHM(Math.abs(delta))}`;
+}
+
   function calLocale(){
   return currentLang==="fr" ? "fr-FR"
     : currentLang==="en" ? "en-GB"
@@ -4042,10 +4298,9 @@ if(e){
 }
 
     // type letter
-    const pill = e ? `<div class="calTypePill">${typeAbbr(e.type)}</div>` : "";
+const pill = e ? `<div class="calTypePill">${typeAbbr(e.type)}</div>` : "";
 
-    // uren tonen (alleen bij werk)
-    const hours = "";
+const hours = "";
 
     // verrekening dot (ook als er geen entry is)
     const vMins = (Array.isArray(state.verrekeningen) ? state.verrekeningen : [])
@@ -4131,6 +4386,8 @@ function openDayDetail(ymdStr){
   }
 
   if(dayBody) dayBody.innerHTML = "";
+  const dayDeltaLabel = formatDayDeltaLabel(ymdStr);
+const dayDeltaLine = dayDeltaLabel ? `<br><b>${escapeHtml(dayDeltaLabel)}</b>` : "";
 
   // GEEN entry: toch tonen als er verrekend is
   if(!e){
@@ -4183,19 +4440,19 @@ if(dayOverlay) dayOverlay.style.display = "none";
     : "";
 
   // ===== WERK =====
-  if(e.type === "Werk"){
-    const start = e.start || "";
-    const end   = e.end || "";
-    const pause = (e.pauseMin || 0);
-    const net   = formatHM(e.netMin || 0);
+if(e.type === "Werk"){
+  const start = e.start || "";
+  const end   = e.end || "";
+  const pause = (e.pauseMin || 0);
+  const net   = formatHM(e.netMin || 0);
 
-    if(dayBody) dayBody.innerHTML =
-      `<b>${t("work_label")}</b><br>
-       ${start}${end ? "–"+end : ""}<br>
-       ${t("pause_line")}: ${pause} ${t("min")}<br>
-       ${t("net_line")}: ${net}
-       ${noteLine}`;
-  }
+  if(dayBody) dayBody.innerHTML =
+    `<b>${t("work_label")}</b><br>
+     ${start}${end ? "–"+end : ""}<br>
+     ${t("pause_line")}: ${pause} ${t("min")}<br>
+     ${t("net_line")}: ${net}${dayDeltaLine}
+     ${noteLine}`;
+}
 
   // ===== RECUP =====
   else if(e.type === "Recup"){
@@ -4447,6 +4704,18 @@ async function pauseTimer(){
     const d = new Date(dateYMD+"T00:00:00");
     return d>=ws && d<we;
   }
+  function isConfiguredOffDay(dateYMD){
+  const offDays = Array.isArray(state.settings?.offDays)
+    ? state.settings.offDays
+    : [];
+
+  if(!offDays.length || !dateYMD) return false;
+
+  const d = new Date(dateYMD + "T00:00:00");
+  const dayNr = ((d.getDay() + 6) % 7) + 1; // ma=1 ... zo=7
+
+  return offDays.includes(dayNr);
+}
 
   function workNetForDate(dateYMD){
     return state.entries
@@ -4480,13 +4749,18 @@ async function pauseTimer(){
 
   let sum = start - (state.overtimePaidMinutes || 0);
     for(const day of days){
-      const hasWork = state.entries.some(e=>!e.deletedAt && e.date===day && e.type==="Werk");
-      const workNet = workNetForDate(day);
-      if(hasWork) sum += (workNet - normDay);
+  const hasWork = state.entries.some(e=>!e.deletedAt && e.date===day && e.type==="Werk");
+  const workNet = workNetForDate(day);
 
-      const recups = state.entries.filter(e=>!e.deletedAt && e.date===day && e.type==="Recup").length;
-      if(recups>0) sum += (-normDay * recups);
-    }
+  if(hasWork){
+    sum += isConfiguredOffDay(day)
+      ? workNet
+      : (workNet - normDay);
+  }
+
+  const recups = state.entries.filter(e=>!e.deletedAt && e.date===day && e.type==="Recup").length;
+  if(recups>0) sum += (-normDay * recups);
+}
     return sum;
   }
 
@@ -4868,12 +5142,14 @@ function entrySubtitle(e){
     return `${(key ? t(key) : e.type).toUpperCase()}${noteLine}${verrekenLine}`;
   }
 
-  return `${t("work_label")}<br>
+const dayDeltaLabel = formatDayDeltaLabel(e.date);
+const deltaLine = dayDeltaLabel ? `<br>${dayDeltaLabel}` : "";
+
+return `${t("work_label")}<br>
 ${e.start || "-"}-${e.end || "-"}<br>
-${t("net_line")} ${formatHM(e.netMin||0)}<br>
+${t("net_line")} ${formatHM(e.netMin||0)}${deltaLine}<br>
 ${t("pause_line")} ${e.pauseMin||0} ${t("minutes")}${noteLine}${verrekenLine}`;
 }
-
 function entryChip(e){
   return formatHM(e.netMin || 0);
 }
@@ -5370,6 +5646,24 @@ async function wireCloudAuthUI(){
 /* =========================
    Settings
    ========================= */
+
+   function getOffDaysLabel(offDays){
+  const arr = Array.isArray(offDays) ? [...offDays].sort((a,b)=>a-b) : [];
+  if(!arr.length) return t("off_days_none");
+
+  const map = {
+    1: t("day_monday_short"),
+    2: t("day_tuesday_short"),
+    3: t("day_wednesday_short"),
+    4: t("day_thursday_short"),
+    5: t("day_friday_short"),
+    6: t("day_saturday_short"),
+    7: t("day_sunday_short")
+  };
+
+  return arr.map(d => map[d] || d).join(", ");
+}
+
 function renderSettings(){
   const startSaldoTxt = formatHM(state.settings.startSaldoMin || 0);
 let [ssh, ssm] = startSaldoTxt.split(":");
@@ -5395,6 +5689,17 @@ if(elNormDayM) elNormDayM.value = nm;
 
   if(emp) emp.value = state.settings.employeeName || "";
   if(emr) emr.value = state.settings.employerName || "";
+
+draftOffDays = Array.isArray(state.settings?.offDays)
+  ? [...state.settings.offDays].sort((a,b)=>a-b)
+  : [];
+
+if(offDaysCurrentLabel){
+  offDaysCurrentLabel.textContent = getOffDaysLabel(draftOffDays);
+}
+if(setupOffDaysCurrentLabel){
+  setupOffDaysCurrentLabel.textContent = getOffDaysLabel(draftOffDays);
+}
 }
 
 function saveSettings(){
@@ -5406,6 +5711,7 @@ function saveSettings(){
     return;
   }
 
+
   const normTxt = `${elNormDayH?.value || "00"}:${elNormDayM?.value || "00"}`;
   const norm = parseHM(normTxt);
 
@@ -5413,11 +5719,13 @@ function saveSettings(){
     showToast(t("err_normday_format"), "warn");
     return;
   }
-  state.settings.startSaldoMin = mins;
-  state.settings.normDayMin = norm;
-  state.settings.lang = currentLang;
+state.settings.startSaldoMin = mins;
+state.settings.normDayMin = norm;
+state.settings.pauseMin = parseInt(elPauseMin?.value || "30", 10) || 30;
+state.settings.offDays = Array.isArray(draftOffDays) ? [...draftOffDays] : [];
+state.settings.lang = currentLang;
+console.log("SAVE SETTINGS offDays", { draftOffDays, saved: state.settings.offDays });
 
-  // 👇 deze twee moeten erbij
   state.settings.employeeName = (document.getElementById("employeeName")?.value || "").trim();
   state.settings.employerName = (document.getElementById("employerName")?.value || "").trim();
 
@@ -5425,6 +5733,130 @@ function saveSettings(){
   renderAll();
   showToast(t("settings_saved"), "ok");
 }
+
+let draftOffDays = [];
+let offDaysOpenedFromSetup = false;
+
+function syncOffDaysModalFromState(){
+  const currentOffDays = Array.isArray(draftOffDays) && draftOffDays.length
+  ? [...draftOffDays]
+  : (Array.isArray(state.settings?.offDays) ? [...state.settings.offDays] : []);
+
+draftOffDays = currentOffDays.sort((a,b)=>a-b);
+
+  for(let i = 1; i <= 7; i++){
+    const cb = document.getElementById(`offDay${i}`);
+    if(cb) cb.checked = draftOffDays.includes(i);
+  }
+
+if(offDaysCurrentLabel){
+  offDaysCurrentLabel.textContent = getOffDaysLabel(draftOffDays);
+}
+if(setupOffDaysCurrentLabel){
+  setupOffDaysCurrentLabel.textContent = getOffDaysLabel(draftOffDays);
+}
+}
+
+btnOffDaysOpen?.addEventListener("click", () => {
+  offDaysOpenedFromSetup = false;
+  console.log("btnOffDaysOpen clicked", { btnOffDaysOpen, offDaysOverlay });
+
+  syncOffDaysModalFromState();
+
+  const overlay = document.getElementById("offDaysOverlay");
+  if(!overlay){
+    alert("offDaysOverlay niet gevonden");
+    return;
+  }
+
+  overlay.style.display = "flex";
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+});
+
+btnSetupOffDaysOpen?.addEventListener("click", () => {
+  offDaysOpenedFromSetup = true;
+  syncOffDaysModalFromState();
+
+  const overlay = document.getElementById("offDaysOverlay");
+  if(!overlay){
+    alert("offDaysOverlay niet gevonden");
+    return;
+  }
+
+if(setupOverlay) setupOverlay.style.display = "none";
+  overlay.style.display = "flex";
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+});
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#btnSetupOffDaysOpen");
+  if(!btn) return;
+
+  offDaysOpenedFromSetup = true;
+  syncOffDaysModalFromState();
+
+  const overlay = document.getElementById("offDaysOverlay");
+  if(!overlay){
+    alert("offDaysOverlay niet gevonden");
+    return;
+  }
+
+  if(setupOverlay) setupOverlay.style.display = "none";
+  overlay.style.display = "flex";
+  overlay.classList.add("show");
+  overlay.setAttribute("aria-hidden", "false");
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#btnOffDaysCancel");
+  if(!btn) return;
+
+  const overlay = document.getElementById("offDaysOverlay");
+  if(!overlay) return;
+
+  overlay.style.display = "none";
+  overlay.classList.remove("show");
+  overlay.setAttribute("aria-hidden", "true");
+  if(offDaysOpenedFromSetup && setupOverlay){
+  setupOverlay.style.display = "flex";
+}
+});
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("#btnOffDaysDone");
+  if(!btn) return;
+
+  const picked = [];
+
+  for(let i = 1; i <= 7; i++){
+    const cb = document.getElementById(`offDay${i}`);
+    if(cb?.checked) picked.push(i);
+  }
+
+  draftOffDays = picked.sort((a,b)=>a-b);
+
+  const label = document.getElementById("offDaysCurrentLabel");
+if(label){
+  label.textContent = getOffDaysLabel(draftOffDays);
+}
+
+const setupLabel = document.getElementById("setupOffDaysCurrentLabel");
+if(setupLabel){
+  setupLabel.textContent = getOffDaysLabel(draftOffDays);
+}
+
+  const overlay = document.getElementById("offDaysOverlay");
+  if(overlay){
+    overlay.style.display = "none";
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+    if(offDaysOpenedFromSetup && setupOverlay){
+  setupOverlay.style.display = "flex";
+}
+  }
+});
+
   function renderOnlineBadge(){
     if(!elOnlineBadge) return;
     const online = navigator.onLine;
@@ -5718,9 +6150,14 @@ if (setupBtn) {
       return;
     }
 
+ const setupOffDays = Array.isArray(draftOffDays)
+  ? [...draftOffDays]
+  : [];
+
     state.settings = state.settings || {};
     state.settings.normDayMin = (hh * 60) + mm;
     state.settings.pauseMin = pauseMin;
+    state.settings.offDays = setupOffDays;
 
     // TAAL OPSLAAN
     const lang = currentLang || "nl";
@@ -5753,6 +6190,19 @@ function openSetupAfterLang(lang){
 
   const setupSelect = document.getElementById("setupLang");
   if(setupSelect) setupSelect.value = lang;
+
+  const setupSavedOffDays = Array.isArray(state.settings?.offDays)
+  ? state.settings.offDays
+  : [];
+
+if (setupOffDay1) setupOffDay1.checked = setupSavedOffDays.includes(1);
+if (setupOffDay2) setupOffDay2.checked = setupSavedOffDays.includes(2);
+if (setupOffDay3) setupOffDay3.checked = setupSavedOffDays.includes(3);
+if (setupOffDay4) setupOffDay4.checked = setupSavedOffDays.includes(4);
+if (setupOffDay5) setupOffDay5.checked = setupSavedOffDays.includes(5);
+if (setupOffDay6) setupOffDay6.checked = setupSavedOffDays.includes(6);
+if (setupOffDay7) setupOffDay7.checked = setupSavedOffDays.includes(7);
+
 
   if(langOverlay) langOverlay.style.display = "none";
   if(setupOverlay) setupOverlay.style.display = "flex";
@@ -5903,6 +6353,63 @@ if (window.ShiftTapNotifications) {
 </div>
 <!-- ===== LANGUAGE MODAL END ===== -->
 
+<!-- ===== OFF DAYS MODAL START ===== -->
+<div class="appModalOverlay" id="offDaysOverlay" style="display:none;" aria-hidden="true">
+  <div class="appModal" role="dialog" aria-modal="true">
+    <div class="appModalBody">
+      <h2 data-i18n="off_days_label" style="margin:0 0 10px 0;">
+        Op welke dagen werkt u normaal niet?
+      </h2>
+
+      <p data-i18n="off_days_info" style="margin:0 0 14px 0;">
+        Werkt u toch op deze dagen, dan tellen alle uren automatisch als overuren.
+      </p>
+
+      <div style="display:grid; gap:10px;">
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay1">
+          <span data-i18n="day_monday">Maandag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay2">
+          <span data-i18n="day_tuesday">Dinsdag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay3">
+          <span data-i18n="day_wednesday">Woensdag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay4">
+          <span data-i18n="day_thursday">Donderdag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay5">
+          <span data-i18n="day_friday">Vrijdag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay6">
+          <span data-i18n="day_saturday">Zaterdag</span>
+        </label>
+
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" id="offDay7">
+          <span data-i18n="day_sunday">Zondag</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="appModalActions">
+      <button type="button" class="btnGhost" id="btnOffDaysCancel" data-i18n="cancel">Annuleren</button>
+      <button type="button" class="btnGreen" id="btnOffDaysDone" data-i18n="ok">OK</button>
+    </div>
+  </div>
+</div>
+<!-- ===== OFF DAYS MODAL END ===== -->
 
 <!-- ===== SETUP MODAL START ===== -->
 <div class="appModalOverlay" id="setupOverlay" style="display:none;" aria-hidden="true">
@@ -6006,7 +6513,20 @@ if (window.ShiftTapNotifications) {
             Dit is uw standaard pauze, deze wordt automatisch afgetrokken.
           </div>
         </div>
+<div class="setupField">
+  <label data-i18n="off_days_label">
+    Op welke dagen werkt u normaal niet?
+  </label>
 
+  <div class="setupHint" data-i18n="off_days_info">
+    Indien u wel werkt op deze dagen, tellen deze automatisch als overuren.
+  </div>
+<button type="button" class="btnSmall" id="btnSetupOffDaysOpen" style="width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; box-sizing:border-box;">
+  <span id="setupOffDaysCurrentLabel">Geen</span>
+  <span aria-hidden="true">▾</span>
+</button>
+
+</div>
       </div>
 
       <p class="setupNote" data-i18n="setup_note">

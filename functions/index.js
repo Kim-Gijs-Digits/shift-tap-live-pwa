@@ -228,62 +228,6 @@ exports.shiftTapEveningCheck = onSchedule(
     await runScheduledCheck("noLogs");
   }
 );
-
-exports.shiftTapSendTestPush = onRequest(async (request, response) => {
-  try {
-    const userId = request.query.userId;
-
-    if (!userId) {
-      response.status(400).send("Missing userId");
-      return;
-    }
-
-    const userSnap = await db.collection("users").doc(userId).get();
-
-    if (!userSnap.exists) {
-      response.status(404).send("User not found");
-      return;
-    }
-
-    const userData = userSnap.data() || {};
-    const token = userData?.messaging?.token;
-
-    if (!token) {
-      response.status(400).send("No messaging token found for this user");
-      return;
-    }
-
-    const lang = pickLang(userData);
-    const title = TEXTS.title[lang];
-    const bodyMap = {
-      nl: "Dit is een testmelding van Shift-Tap.",
-      en: "This is a Shift-Tap test notification.",
-      fr: "Ceci est une notification de test Shift-Tap.",
-      de: "Dies ist eine Shift-Tap-Testbenachrichtigung.",
-      pl: "To jest testowe powiadomienie Shift-Tap.",
-      es: "Esta es una notificación de prueba de Shift-Tap.",
-      hu: "Ez egy Shift-Tap tesztértesítés.",
-      it: "Questa è una notifica di test di Shift-Tap."
-    };
-
-    await admin.messaging().send({
-      token,
-      notification: {
-        title,
-        body: bodyMap[lang] || bodyMap.en
-      },
-      webpush: {
-        notification: {
-          title,
-          body: bodyMap[lang] || bodyMap.en,
-          icon: "/ST-logo.png"
-        }
-      }
-    });
-
-    response.send(`Test push sent to ${userId}`);
-  } catch (err) {
-    console.error("Test push failed:", err);
-    response.status(500).send(err.message || "Test push failed");
-  }
+exports.shiftTapSendTestPush = onRequest((request, response) => {
+  response.status(403).send("Disabled in production");
 });
