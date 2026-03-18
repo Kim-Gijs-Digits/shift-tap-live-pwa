@@ -1785,6 +1785,49 @@ button:active,
   </div>
 </div>
 
+
+<!-- ===== SETUP LOGIN MODAL START ===== -->
+<div class="appModalOverlay" id="setupLoginOverlay" style="display:none;" aria-hidden="true">
+  <div class="appModal" role="dialog" aria-modal="true">
+    <div class="appModalBody" style="text-align:center;">
+      <div style="font-size:32px; margin-bottom:10px;">🔐</div>
+
+      <h2 data-i18n="setup_login_title" style="margin:0 0 12px 0;">
+        Inloggen met Google?
+      </h2>
+
+      <p data-i18n="setup_login_intro" style="margin:0 0 16px 0;">
+        Log in om cloud sync en back-up te gebruiken. Je kan ook zonder login verdergaan.
+      </p>
+
+      <div class="status" style="margin-top:0; margin-bottom:16px; justify-content:center;">
+        <span class="iconBox stop" id="setupLoginStatusIcon"></span>
+        <span id="setupLoginStatus" data-i18n="cloud_not_logged">Niet ingelogd.</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button
+          type="button"
+          class="btnGhost"
+          id="btnSetupGoogleLogin"
+          data-i18n="login_google">
+          Inloggen met Google
+        </button>
+
+        <button
+          type="button"
+          class="btnSmall"
+          id="btnSetupContinueWithoutLogin"
+          data-i18n="setup_continue_without_login">
+          Verder zonder login
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== SETUP LOGIN MODAL END ===== -->
+
+
 <script>
 (() => {
 
@@ -1883,6 +1926,11 @@ const btnGoogleLogout = document.getElementById("btnGoogleLogout") || null;
 const btnCloudPull    = document.getElementById("btnCloudPull") || null;
 const btnCloudPush    = document.getElementById("btnCloudPush") || null;
 
+const setupLoginStatus = document.getElementById("setupLoginStatus") || null;
+const setupLoginStatusIcon = document.getElementById("setupLoginStatusIcon") || null;
+const btnSetupGoogleLogin = document.getElementById("btnSetupGoogleLogin") || null;
+const btnSetupContinueWithoutLogin = document.getElementById("btnSetupContinueWithoutLogin") || null;
+
 function setCloudUiEnabled(enabled){
   if(btnGoogleLogin)  btnGoogleLogin.disabled  = !enabled;
   if(btnGoogleLogout) btnGoogleLogout.disabled = !enabled;
@@ -1895,12 +1943,33 @@ window.showStartSaldoInfo = function(){
 
 function setLoginUi(user){
   const loggedIn = !!user;
+  const loginName = user?.email || user?.displayName || "Google";
+
   if(btnGoogleLogin)  btnGoogleLogin.style.display  = loggedIn ? "none" : "inline-flex";
   if(btnGoogleLogout) btnGoogleLogout.style.display = loggedIn ? "inline-flex" : "none";
+
   if(elLoginNote){
     elLoginNote.textContent = loggedIn
-      ? `✅ ${t("cloud_logged_in")} ${user.email || user.displayName || "Google"}`
+      ? `✅ ${t("cloud_logged_in")} ${loginName}`
       : t("cloud_not_logged");
+  }
+
+  if(setupLoginStatus){
+    setupLoginStatus.textContent = loggedIn
+      ? `✅ ${t("cloud_logged_in")} ${loginName}`
+      : t("cloud_not_logged");
+  }
+
+  if(setupLoginStatusIcon){
+    setupLoginStatusIcon.className = `iconBox ${loggedIn ? "play" : "stop"}`;
+  }
+
+  if(btnSetupGoogleLogin){
+    btnSetupGoogleLogin.style.display = loggedIn ? "none" : "inline-flex";
+  }
+if(loggedIn && !isSetupDone() && setupLoginOverlay && setupLoginOverlay.style.display !== "none"){
+  setupLoginOverlay.style.display = "none";
+  document.getElementById("setupOverlay")?.style.setProperty("display", "flex");
 }
 }
 
@@ -2072,6 +2141,9 @@ day_sunday_short: "Zo",
   setup_pause_hint: "Dit is uw standaard pauze, deze wordt automatisch afgetrokken.",
   setup_note: "Je kan deze instellingen later altijd aanpassen bij Instellingen.",
   setup_done: "Klaar voor gebruik",
+  setup_login_title: "Inloggen met Google?",
+setup_login_intro: "Log in om cloud sync en back-up te gebruiken. Je kan ook zonder login verdergaan.",
+setup_continue_without_login: "Verder zonder login",
 
   // --- Info bubbles ---
   calendar_info: "Hier krijg je een overzicht per dag. Je ziet wanneer je recup, ziekte, vakantie, feestdag had of gewerkt hebt.\nVerrekeningen worden weergegeven met een groen bolletje.\nTik op een dag om details te bekijken of iets toe te voegen.",
@@ -2265,6 +2337,9 @@ day_sunday_short: "Dom",
   setup_pause_hint: "Questa è la pausa standard che verrà sottratta automaticamente.",
   setup_note: "Puoi sempre modificare queste impostazioni più tardi nelle Impostazioni.",
   setup_done: "Pronto all'uso",
+setup_login_title: "Accedere con Google?",
+setup_login_intro: "Accedi per usare la sincronizzazione cloud e il backup. Puoi anche continuare senza accesso.",
+setup_continue_without_login: "Continua senza accesso",
 
   // --- Info bubbles ---
   calendar_info: "Qui hai una panoramica giornaliera. Vedi quando hai avuto recupero, malattia, ferie, festivo o hai lavorato.\nLe compensazioni sono indicate con un punto verde.\nTocca un giorno per vedere i dettagli o aggiungere una voce.",
@@ -2467,6 +2542,9 @@ day_sunday_short: "Sun",
   setup_pause_hint: "This is your default break and will be automatically deducted.",
   setup_note: "You can always change these settings later in Settings.",
   setup_done: "Ready to use",
+  setup_login_title: "Sign in with Google?",
+setup_login_intro: "Sign in to use cloud sync and backup. You can also continue without signing in.",
+setup_continue_without_login: "Continue without login",
 
   // ===== Info bubbles =====
   calendar_info: "Here you get a daily overview. You can see when you had a comp day, sick leave, vacation, public holiday or worked.\nSettlements are indicated with a green dot.\nTap a day to view details or add an entry.",
@@ -2664,6 +2742,9 @@ day_sunday_short: "V",
   setup_pause_hint: "Ez az alapértelmezett szünet, amely automatikusan levonásra kerül.",
   setup_note: "Ezeket a beállításokat később bármikor módosíthatod.",
   setup_done: "Készen áll a használatra",
+  setup_login_title: "Bejelentkezés Google-fiókkal?",
+setup_login_intro: "Jelentkezz be a felhőszinkron és a biztonsági mentés használatához. Bejelentkezés nélkül is továbbléphetsz.",
+setup_continue_without_login: "Folytatás bejelentkezés nélkül",
 
   // --- Info bubbles ---
   calendar_info: "Itt napi áttekintést kapsz. Láthatod mikor volt szabadnapod, betegszabadságod, szabadságod vagy munkád.\nAz elszámolások zöld ponttal jelennek meg.\nÉrints meg egy napot a részletekhez vagy új bejegyzéshez.",
@@ -2850,6 +2931,9 @@ day_sunday_short: "So",
   setup_pause_hint: "Dies ist deine Standardpause und wird automatisch abgezogen.",
   setup_note: "Du kannst diese Einstellungen später jederzeit ändern.",
   setup_done: "Bereit",
+setup_login_title: "Mit Google anmelden?",
+setup_login_intro: "Melde dich an, um Cloud-Sync und Backup zu nutzen. Du kannst auch ohne Anmeldung fortfahren.",
+setup_continue_without_login: "Ohne Anmeldung fortfahren",
 
   calendar_info: "Hier bekommst du eine Tagesübersicht. Du siehst wann du Freizeitausgleich, Krankheit, Urlaub, Feiertag hattest oder gearbeitet hast.\nVerrechnungen werden mit einem grünen Punkt angezeigt.\nTippe auf einen Tag um Details zu sehen oder etwas hinzuzufügen.",
   settle_info: "Verwende diese Taste wenn Überstunden ausbezahlt wurden. Die eingegebene Stundenanzahl wird vom Überstunden-Saldo abgezogen.",
@@ -3046,6 +3130,9 @@ day_sunday_short: "Nd",
   setup_pause_hint: "To jest twoja domyślna przerwa i zostanie automatycznie odjęta.",
   setup_note: "Te ustawienia możesz później zawsze zmienić w ustawieniach.",
   setup_done: "Gotowe do użycia",
+  setup_login_title: "Zalogować się przez Google?",
+setup_login_intro: "Zaloguj się, aby korzystać z synchronizacji w chmurze i kopii zapasowej. Możesz też kontynuować bez logowania.",
+setup_continue_without_login: "Kontynuuj bez logowania",
 
   // --- Info bubbles ---
   calendar_info: "Tutaj masz przegląd każdego dnia. Widzisz kiedy miałeś odbiór, chorobowe, urlop, święto lub pracowałeś.\nRozliczenia są oznaczone zieloną kropką.\nDotknij dnia aby zobaczyć szczegóły lub coś dodać.",
@@ -3242,6 +3329,9 @@ day_sunday_short: "Dom",
   setup_pause_hint: "Esta es tu pausa predeterminada y se descontará automáticamente.",
   setup_note: "Siempre puedes cambiar estos ajustes más tarde en Configuración.",
   setup_done: "Listo para usar",
+  setup_login_title: "¿Iniciar sesión con Google?",
+setup_login_intro: "Inicia sesión para usar la sincronización en la nube y la copia de seguridad. También puedes continuar sin iniciar sesión.",
+setup_continue_without_login: "Continuar sin iniciar sesión",
 
   // --- Info bubbles ---
   calendar_info: "Aquí tienes una vista general por día. Ves cuándo tuviste recuperación, baja médica, vacaciones, festivo o trabajaste.\nLas liquidaciones se muestran con un punto verde.\nToca un día para ver detalles o añadir algo.",
@@ -3441,6 +3531,9 @@ day_sunday_short: "Dim",
   setup_pause_hint: "Ceci est votre pause standard, elle sera automatiquement déduite.",
   setup_note: "Vous pouvez toujours modifier ces paramètres plus tard dans les paramètres.",
   setup_done: "Prêt à l’emploi",
+  setup_login_title: "Se connecter avec Google ?",
+setup_login_intro: "Connecte-toi pour utiliser la synchronisation cloud et la sauvegarde. Tu peux aussi continuer sans connexion.",
+setup_continue_without_login: "Continuer sans connexion",
 
   // ===== Info bubbles =====
   calendar_info: "Ici tu as une vue par jour. Tu vois quand tu avais un jour de récup, maladie, vacances, jour férié ou travaillé.\nLes régularisations sont indiquées par un point vert.\nAppuie sur un jour pour voir les détails ou ajouter une entrée.",
@@ -6047,6 +6140,7 @@ if(isWeekLocked(weekInfo.key)){
 });
 // Settings
 btnSaveSettings?.addEventListener("click", saveSettings);
+document.getElementById("btnGoogleLogout")?.addEventListener("click", ()=> logoutGoogle().catch(console.error));
 btnCloseModal?.addEventListener("click", closeModal);
 modalBack?.addEventListener("click", (e)=>{ if(e.target===modalBack) closeModal(); });
 btnSaveModal?.addEventListener("click", saveModal);
@@ -6063,6 +6157,24 @@ async function init(){
 
 // Stop normale init als setup nog niet gedaan is
 if(!isSetupDone()){
+  try{
+    await handleRedirectLoginResult();
+  }catch(e){
+    console.warn("redirect init error:", e);
+  }
+
+  try{
+    await wireCloudAuthUI();
+  }catch(e){
+    console.warn("auth UI error:", e);
+  }
+
+  const savedSetupLang = localStorage.getItem("lang");
+  if(savedSetupLang){
+    openSetupAfterLang(savedSetupLang);
+    return;
+  }
+
   const langOverlay = document.getElementById("langOverlay");
   if(langOverlay){
     langOverlay.style.display = "flex";
@@ -6178,6 +6290,7 @@ if (setupBtn) {
 }
 // ===== LANGUAGE MODAL =====
 const langOverlay = document.getElementById("langOverlay");
+const setupLoginOverlay = document.getElementById("setupLoginOverlay");
 const setupOverlay = document.getElementById("setupOverlay");
 
 function openSetupAfterLang(lang){
@@ -6206,9 +6319,23 @@ if (setupOffDay6) setupOffDay6.checked = setupSavedOffDays.includes(6);
 if (setupOffDay7) setupOffDay7.checked = setupSavedOffDays.includes(7);
 
 
-  if(langOverlay) langOverlay.style.display = "none";
+if(langOverlay) langOverlay.style.display = "none";
+if(setupOverlay) setupOverlay.style.display = "none";
+if(setupLoginOverlay) setupLoginOverlay.style.display = "flex";
+
+setLoginUi(currentUser());
+
+if(currentUser()){
+  openSetupSettingsStep();
+}
+}
+function openSetupSettingsStep(){
+  if(setupLoginOverlay) setupLoginOverlay.style.display = "none";
   if(setupOverlay) setupOverlay.style.display = "flex";
 }
+
+btnSetupGoogleLogin?.addEventListener("click", ()=> loginGoogle().catch(console.error));
+btnSetupContinueWithoutLogin?.addEventListener("click", openSetupSettingsStep);
 
 document.getElementById("btnLangNl")?.addEventListener("click", () => openSetupAfterLang("nl"));
 document.getElementById("btnLangEn")?.addEventListener("click", () => openSetupAfterLang("en"));
